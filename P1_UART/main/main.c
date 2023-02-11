@@ -8,7 +8,7 @@
 #include "stdlib.h"
 
 
-#define MASTER      0
+#define MASTER   0
 #define SLAVE    1
 #define MODE        SLAVE  
 

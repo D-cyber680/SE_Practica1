@@ -25,22 +25,30 @@ void app_main()
         .stop_bits = UART_STOP_BITS_1,
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
         .source_clk = UART_SCLK_APB,
-        };
+    };
     uart_param_config(UART_NUM_1, &uart_config);
     uart_set_pin(UART_NUM_1, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
     uart_driver_install(UART_NUM_1, 1024, 0, 0, NULL, 0);
-    
+
     uartInit(0, 115200, 8, eStop, eParityEven, UART_TX_PIN0, UART_RX_PIN0); // uart_num, baudrate,  size,  parity, stop,  txPin,  rxPin)
 
     while (1)
     {
-        uart_write_bytes(UART_NUM_1, "ON", 2); // envía el comando "ON" por UART
+        uart_write_bytes(UART_NUM_1, "10", 2); // envía el comando "ON" por UART
         uartClrScr(0);
-        uartPuts(0, "Prendiendo");
+        uartPuts(0, "Sended: 0x10");
         vTaskDelay(1000 / portTICK_PERIOD_MS);
-        uart_write_bytes(UART_NUM_1, "OFF", 3); // envía el comando "OFF" por UART
+        uart_write_bytes(UART_NUM_1, "11", 2); // envía el comando "OFF" por UART
         uartClrScr(0);
-        uartPuts(0, "Apagando");
+        uartPuts(0, "Sended: 0x11");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        uart_write_bytes(UART_NUM_1, "12", 2);
+        uartClrScr(0);
+        uartPuts(0, "Sended: 0x12");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        uart_write_bytes(UART_NUM_1, "13", 2);
+        uartClrScr(0);
+        uartPuts(0, "Sended: 0x13");
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }

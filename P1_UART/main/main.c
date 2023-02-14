@@ -32,6 +32,8 @@ void app_main()
     uart_set_pin(UART_NUM_1, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
     uart_driver_install(UART_NUM_1, 1024, 0, 0, NULL, 0);
 
+    uartInit(0, 115200, 8, eStop, eParityEven, UART_TX_PIN0, UART_RX_PIN0); // uart_num, baudrate,  size,  parity, stop,  txPin,  rxPin)
+
     uint8_t rx_buffer[3];
     while (1)
     {
@@ -39,9 +41,14 @@ void app_main()
         if (len == 2 && rx_buffer[0] == 'O' && rx_buffer[1] == 'N')
         {
             gpio_set_level(LED, 1);
-        }else if (len == 3 && rx_buffer[0] == 'O' && rx_buffer[1] == 'F' && rx_buffer[2] == 'F')
+            uartClrScr(0);
+            uartPuts(0, "Prendido");
+        }
+        else if (len == 3 && rx_buffer[0] == 'O' && rx_buffer[1] == 'F' && rx_buffer[2] == 'F')
         {
             gpio_set_level(LED, 0); // apaga el LED
+            uartClrScr(0);
+            uartPuts(0, "Apagado");
         }
     }
 }

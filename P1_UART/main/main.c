@@ -51,6 +51,7 @@ void app_main()
         {
             uartClrScr(0);
             uartPuts(0, "Comando: 0x13");
+            uartClrScr(0);
         }
         else
         {

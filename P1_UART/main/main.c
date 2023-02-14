@@ -8,97 +8,39 @@
 #include "string.h"
 #include "stdlib.h"
 
-#define MASTER 2
+#define MASTER 0
 #define SLAVE 1
 #define MODE SLAVE
 
-// ACTIVAR COMANDOS CON BOTONES:
-#define CMD_0 GPIO_NUM_12
-#define CMD_1 GPIO_NUM_14
-#define CMD_2 GPIO_NUM_27
-#define CMD_3 GPIO_NUM_26
+#define TXD_PIN (GPIO_NUM_17)
+#define RXD_PIN (GPIO_NUM_16)
+#define BAUD_RATE 115200
 
-#define LED GPIO_NUM_0
-
-uint32_t get_time_in_seconds()
+void app_main()
 {
-    return xTaskGetTickCount() / configTICK_RATE_HZ;
-}
-
-void init_master_inputs()
-{
-    gpio_reset_pin(CMD_0);
-    gpio_reset_pin(CMD_1);
-    gpio_reset_pin(CMD_2);
-    gpio_reset_pin(CMD_3);
-
-    gpio_set_direction(CMD_0, GPIO_MODE_INPUT);
-    gpio_set_direction(CMD_1, GPIO_MODE_INPUT);
-    gpio_set_direction(CMD_2, GPIO_MODE_INPUT);
-    gpio_set_direction(CMD_3, GPIO_MODE_INPUT);
-
-    gpio_set_pull_mode(CMD_0, GPIO_PULLUP_ONLY);
-    gpio_set_pull_mode(CMD_1, GPIO_PULLUP_ONLY);
-    gpio_set_pull_mode(CMD_2, GPIO_PULLUP_ONLY);
-    gpio_set_pull_mode(CMD_3, GPIO_PULLUP_ONLY);
-}
-
-void init_slave_outputs()
-{
-    gpio_reset_pin(LED);
-    gpio_set_direction(LED, GPIO_MODE_OUTPUT);
-}
-
-void app_main(void)
-{
-    uartInit(0, 115200, 8, eParityEven, eStop, 1, 3);
-    // uartInit(1, 115200, 8, eParityEven, eStop, 17, 16);
-    uart_flush(0);
-    // uart_flush(1); // limpiamos buffer de recibir
+    uart_config_t uart_config = {
+        .baud_rate = BAUD_RATE,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .source_clk = UART_SCLK_APB,
+        };
+    uart_param_config(UART_NUM_1, &uart_config);
+    uart_set_pin(UART_NUM_1, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    uart_driver_install(UART_NUM_1, 1024, 0, 0, NULL, 0);
+    
+    uartInit(0, 115200, 8, eStop, eParityEven, UART_TX_PIN0, UART_RX_PIN0); // uart_num, baudrate,  size,  parity, stop,  txPin,  rxPin)
 
     while (1)
     {
-#if MODE == SLAVE
-        uint8_t command[1];
-        int len = uart_read_bytes(0, command, 1, portMAX_DELAY);
-        char *tag = "info";
-        init_slave_outputs();
-
-        if (command[0] == 0x10)
-        {
-            ESP_LOGI(tag, "Timestamp = %d", get_time_in_seconds());
-        }
-        else if (command[0] == 0x11)
-        {
-            ESP_LOGI(tag, "Estado del led = ");
-        }
-        else if (command[0] == 0x12)
-        {
-            ESP_LOGI(tag, "Temperatura = 45");
-        }
-        else if (command[0] == 0x13)
-        {
-            ESP_LOGI(tag, "Invertimos el LED");
-        }
-
-#elif MODE == MASTER
-        if (gpio_get_level(CMD_0) == 0)
-        {
-            uartPutchar(0, 0x10);
-        }
-        else if (gpio_get_level(CMD_1) == 0)
-        {
-            uartPutchar(0, 0x11);
-        }
-        else if (gpio_get_level(CMD_2) == 0)
-        {
-            uartPutchar(0, 0x12);
-        }
-        else if (gpio_get_level(CMD_3) == 0)
-        {
-            uartPutchar(0, 0x13);
-        }
-#endif
-        delayMs(5); // Necesario para el watchdog
+        uart_write_bytes(UART_NUM_1, "ON", 2); // envía el comando "ON" por UART
+        uartClrScr(0);
+        uartPuts(0, "Prendiendo");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        uart_write_bytes(UART_NUM_1, "OFF", 3); // envía el comando "OFF" por UART
+        uartClrScr(0);
+        uartPuts(0, "Apagando");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }

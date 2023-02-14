@@ -15,6 +15,7 @@
 #define TXD_PIN (GPIO_NUM_17)
 #define RXD_PIN (GPIO_NUM_16)
 #define LED (GPIO_NUM_2)
+
 #define BAUD_RATE 115200
 
 void app_main()

@@ -56,7 +56,7 @@ void app_main()
         else
         {
             uartClrScr(0);
-            uartPuts(0, "Ese comando no existe");
+            //uartPuts(0, "Ese comando no existe");
         }
     }
 }

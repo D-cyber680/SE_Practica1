@@ -12,93 +12,36 @@
 #define SLAVE 1
 #define MODE SLAVE
 
-// ACTIVAR COMANDOS CON BOTONES:
-#define CMD_0 GPIO_NUM_12
-#define CMD_1 GPIO_NUM_14
-#define CMD_2 GPIO_NUM_27
-#define CMD_3 GPIO_NUM_26
+#define TXD_PIN (GPIO_NUM_17)
+#define RXD_PIN (GPIO_NUM_16)
+#define LED (GPIO_NUM_2)
+#define BAUD_RATE 115200
 
-#define LED GPIO_NUM_0
-
-uint32_t get_time_in_seconds()
+void app_main()
 {
-    return xTaskGetTickCount() / configTICK_RATE_HZ;
-}
+    gpio_pad_select_gpio(LED_PIN);
+    gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
 
-void init_master_inputs()
-{
-    gpio_reset_pin(CMD_0);
-    gpio_reset_pin(CMD_1);
-    gpio_reset_pin(CMD_2);
-    gpio_reset_pin(CMD_3);
+    uart_config_t uart_config = {
+        .baud_rate = BAUD_RATE,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE};
+    uart_param_config(UART_NUM_1, &uart_config);
+    uart_set_pin(UART_NUM_1, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    uart_driver_install(UART_NUM_1, 1024, 0, 0, NULL, 0);
 
-    gpio_set_direction(CMD_0, GPIO_MODE_INPUT);
-    gpio_set_direction(CMD_1, GPIO_MODE_INPUT);
-    gpio_set_direction(CMD_2, GPIO_MODE_INPUT);
-    gpio_set_direction(CMD_3, GPIO_MODE_INPUT);
-
-    gpio_set_pull_mode(CMD_0, GPIO_PULLUP_ONLY);
-    gpio_set_pull_mode(CMD_1, GPIO_PULLUP_ONLY);
-    gpio_set_pull_mode(CMD_2, GPIO_PULLUP_ONLY);
-    gpio_set_pull_mode(CMD_3, GPIO_PULLUP_ONLY);
-}
-
-void init_slave_outputs()
-{
-    gpio_reset_pin(LED);
-    gpio_set_direction(LED, GPIO_MODE_OUTPUT);
-}
-
-void app_main(void)
-{
-    uartInit(0, 115200, 8, eParityEven, eStop, 1, 3);
-    // uartInit(1, 115200, 8, eParityEven, eStop, 17, 16);
-    uart_flush(0);
-    // uart_flush(1); // limpiamos buffer de recibir
-
+    uint8_t rx_buffer[3];
     while (1)
     {
-#if MODE == SLAVE
-        uint8_t command[1];
-        int len = uart_read_bytes(0, command, 1, portMAX_DELAY);
-        char *tag = "info";
-        init_slave_outputs();
-
-        if (command[0] == 0x10)
+        int len = uart_read_bytes(UART_NUM_1, rx_buffer, 3, pdMS_TO_TICKS(100));
+        if (len == 2 && rx_buffer[0] == 'O' && rx_buffer[1] == 'N')
         {
-            ESP_LOGI(tag, "Timestamp = %d", get_time_in_seconds());
-        }
-        else if (command[0] == 0x11)
+            gpio_set_level(LED, 1);
+        }else if (len == 3 && rx_buffer[0] == 'O' && rx_buffer[1] == 'F' && rx_buffer[2] == 'F')
         {
-            ESP_LOGI(tag, "Estado del led = ");
+            gpio_set_level(LED, 0); // apaga el LED
         }
-        else if (command[0] == 0x12)
-        {
-            ESP_LOGI(tag, "Temperatura = 45");
-        }
-        else if (command[0] == 0x13)
-        {
-            ESP_LOGI(tag, "Invertimos el LED");
-        }
-
-#elif MODE == MASTER
-        if (gpio_get_level(CMD_0) == 0)
-        {
-            uartPutchar(0, 0x10);
-        }
-        else if (gpio_get_level(CMD_1) == 0)
-        {
-            uartPutchar(0, 0x11);
-        }
-        else if (gpio_get_level(CMD_2) == 0)
-        {
-            uartPutchar(0, 0x12);
-        }
-        else if (gpio_get_level(CMD_3) == 0)
-        {
-            uartPutchar(0, 0x13);
-        }
-#endif
-        delayMs(5); // Necesario para el watchdog
     }
 }

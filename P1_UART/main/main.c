@@ -68,6 +68,7 @@ void app_main()
         {
             //sprintf(feedback, "(Timestamp) %d segundos", get_time_in_seconds());
             uartClrScr(0);
+            uartPuts(0, "Comando: 0x10");
             //uartPuts(0, feedback);
             //uart_write_bytes(UART_NUM_1, feedback, strlen(feedback));
          }

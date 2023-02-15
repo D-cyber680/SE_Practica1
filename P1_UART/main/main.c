@@ -7,6 +7,7 @@
 #include "stdio.h"
 #include "string.h"
 #include "stdlib.h"
+#include "esp_log.h"
 
 #define MASTER 2
 #define SLAVE 1
@@ -48,7 +49,7 @@ void toggle_led_state(uint8_t *led_state)
 
 void app_main()
 {
-    char feedback[100];
+    char feedback[50];
     uint8_t led_state = 0;
     gpio_reset_pin(LED);
     gpio_set_direction(LED, GPIO_MODE_OUTPUT);

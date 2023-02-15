@@ -66,29 +66,29 @@ void app_main()
         int len = uart_read_bytes(UART_NUM_1, command, 3, pdMS_TO_TICKS(100));
         if (len == 2 && command[0] == '1' && command[1] == '0')
         {
-            sprintf(feedback, "(Timestamp) %d segundos", get_time_in_seconds());
+            //sprintf(feedback, "(Timestamp) %d segundos", get_time_in_seconds());
             uartClrScr(0);
-            uartPuts(0, feedback);
-            uart_write_bytes(UART_NUM_1, feedback, strlen(feedback));
+            //uartPuts(0, feedback);
+            //uart_write_bytes(UART_NUM_1, feedback, strlen(feedback));
          }
         else if (len == 2 && command[0] == '1' && command[1] == '1')
         {
-            sprintf(feedback, "(LED STATE) %d  ", led_state);
-            uartPuts(0, feedback);
-            send_led_state(&led_state);
+           // sprintf(feedback, "(LED STATE) %d  ", led_state);
+            //uartPuts(0, feedback);
+           // send_led_state(&led_state);
             uartClrScr(0);
             uartPuts(0, "Comando: 0x11");
         }
         else if (len == 2 && command[0] == '1' && command[1] == '2')
         {
-            uartClrScr(0);
+           uartClrScr(0);
             uartPuts(0, "Comando: 0x12");
-            send_temp();
+            //send_temp();
         }
         else if (len == 2 && command[0] == '1' && command[1] == '3')
         {
-            toggle_led_state(&led_state);
-            uartClrScr(0);
+            //toggle_led_state(&led_state);
+            //uartClrScr(0);
             uartPuts(0, "Comando: 0x13");
             uartClrScr(0);
         }

@@ -29,15 +29,19 @@ uint32_t get_time_in_seconds()
 // F. cmd. 0x11
 uint8_t send_led_state(uint8_t *led_state)
 {
-    //enviar devuelta
+    char led_cad[20];
+    sprintf(led_cad, "led = %d", *led_state);
+    uart_write_bytes(UART_NUM_1, led_cad, strlen(led_cad));
     return *led_state;
 }
-//F. comando 0x12
-void send_temp(void){
+// F. comando 0x12
+void send_temp(void)
+{
     int num = rand() % 100;
-    char cad[4];
+    char cad[3];
     myItoa(num, cad, 10);
-    //UartPuts(2, cad);
+    uartPuts(0, cad);
+    uart_write_bytes(UART_NUM_1, cad, strlen(cad));
 }
 
 // F comando 0x13
@@ -62,13 +66,16 @@ void app_main()
         int len = uart_read_bytes(UART_NUM_1, command, 3, pdMS_TO_TICKS(100));
         if (len == 2 && command[0] == '1' && command[1] == '0')
         {
-            sprintf(feedback, "(Timestamp) Han transcurrido %d segundos", get_time_in_seconds());
+            sprintf(feedback, "(Timestamp) %d segundos", get_time_in_seconds());
             uartClrScr(0);
             uartPuts(0, feedback);
             uart_write_bytes(UART_NUM_1, feedback, strlen(feedback));
-        }
+         }
         else if (len == 2 && command[0] == '1' && command[1] == '1')
         {
+            sprintf(feedback, "(LED STATE) %d  ", led_state);
+            uartPuts(0, feedback);
+            send_led_state(&led_state);
             uartClrScr(0);
             uartPuts(0, "Comando: 0x11");
         }
@@ -76,6 +83,7 @@ void app_main()
         {
             uartClrScr(0);
             uartPuts(0, "Comando: 0x12");
+            send_temp();
         }
         else if (len == 2 && command[0] == '1' && command[1] == '3')
         {

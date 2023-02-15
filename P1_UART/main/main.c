@@ -18,8 +18,37 @@
 
 #define BAUD_RATE 115200
 
+// F comando 0x10
+uint32_t get_time_in_seconds()
+{
+    // enviar devuelta
+    return xTaskGetTickCount() / configTICK_RATE_HZ;
+}
+
+// F. cmd. 0x11
+uint8_t send_led_state(uint8_t *led_state)
+{
+    //enviar devuelta
+    return *led_state;
+}
+//F. comando 0x12
+void send_temp(void){
+    int num = rand() % 100;
+    char cad[4];
+    myItoa(num, cad, 10);
+    //UartPuts(2, cad);
+}
+
+// F comando 0x13
+void toggle_led_state(uint8_t *led_state)
+{
+    *led_state == 1 ? (*led_state = 0) : (*led_state = 1);
+    gpio_set_level(LED, *led_state);
+}
+
 void app_main()
 {
+    char feedback[100];
     uint8_t led_state = 0;
     gpio_reset_pin(LED);
     gpio_set_direction(LED, GPIO_MODE_OUTPUT);
@@ -32,13 +61,13 @@ void app_main()
         int len = uart_read_bytes(UART_NUM_1, command, 3, pdMS_TO_TICKS(100));
         if (len == 2 && command[0] == '1' && command[1] == '0')
         {
-            gpio_set_level(LED, 1);
+            sprintf(feedback, "(Timestamp) Han transcurrido %d segundos", get_time_in_seconds());
             uartClrScr(0);
-            uartPuts(0, "Comando: 0x10");
+            uartPuts(0, feedback);
+            uart_write_bytes(UART_NUM_1, feedback, strlen(feedback));
         }
         else if (len == 2 && command[0] == '1' && command[1] == '1')
         {
-            gpio_set_level(LED, 0); // apaga el LED
             uartClrScr(0);
             uartPuts(0, "Comando: 0x11");
         }
@@ -49,6 +78,7 @@ void app_main()
         }
         else if (len == 2 && command[0] == '1' && command[1] == '3')
         {
+            toggle_led_state(&led_state);
             uartClrScr(0);
             uartPuts(0, "Comando: 0x13");
             uartClrScr(0);
@@ -56,7 +86,7 @@ void app_main()
         else
         {
             uartClrScr(0);
-            //uartPuts(0, "Ese comando no existe");
+            // uartPuts(0, "Ese comando no existe");
         }
     }
 }

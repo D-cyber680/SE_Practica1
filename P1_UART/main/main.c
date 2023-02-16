@@ -22,7 +22,7 @@ uint32_t get_time_in_seconds()
 {
     // enviar devuelta
     char secs[20];
-    sprintf(secs, "timestamp=%d",xTaskGetTickCount()/configTICK_RATE_HZ);
+    sprintf(secs, "timestamp=%d", xTaskGetTickCount() / configTICK_RATE_HZ);
     uartPuts(0, secs);
     uartPuts(1, secs);
     return xTaskGetTickCount() / configTICK_RATE_HZ;
@@ -32,8 +32,10 @@ uint32_t get_time_in_seconds()
 uint8_t send_led_state(uint8_t led_state)
 {
     char led_cad[20];
-    sprintf(led_cad, "led = %d",led_state);
-    uart_write_bytes(UART_NUM_1, led_cad, strlen(led_cad));
+    sprintf(led_cad, "led=%d", led_state);
+    uartPuts(0, led_cad);
+    uartPuts(1, led_cad);
+    //uart_write_bytes(UART_NUM_1, led_cad, strlen(led_cad));
     return led_state;
 }
 // F. comando 0x12
@@ -50,7 +52,7 @@ void send_temp(void)
 void toggle_led_state(uint8_t *led_state)
 {
     *led_state == 1 ? (*led_state = 0) : (*led_state = 1);
-    gpio_set_level(LED,*led_state);
+    gpio_set_level(LED, *led_state);
 }
 
 void app_main()
@@ -76,6 +78,8 @@ void app_main()
         {
             uartClrScr(0);
             uartPuts(0, "Comando: 0x11");
+            uartGotoxy(0, 5, 5);
+            send_led_state(led_state);
         }
         else if (len == 2 && command[0] == '1' && command[1] == '2')
         {
@@ -83,12 +87,10 @@ void app_main()
             uartPuts(0, "Comando: 0x12");
         }
         else if (len == 2 && command[0] == '1' && command[1] == '3')
-        {   
+        {
             uartClrScr(0);
             toggle_led_state(&led_state);
             uartPuts(0, "Comando: 0x13");
-            
         }
-        
     }
 }

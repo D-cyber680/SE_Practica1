@@ -43,7 +43,7 @@ void send_temp(void)
 {
     //uint8_t num = rand() % 100;
     char cad[20];
-    sprintf(cad, "temp=45C");
+    strcpy(cad, "temp=45");
     uartPuts(0, cad);
     uartPuts(1, cad);
 }

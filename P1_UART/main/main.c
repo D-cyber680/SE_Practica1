@@ -18,6 +18,7 @@
 
 void app_main()
 {
+    char secs[20];
     uart_config_t uart_config = {
         .baud_rate = BAUD_RATE,
         .data_bits = UART_DATA_8_BITS,
@@ -35,7 +36,10 @@ void app_main()
     while (1)
     {
         uart_write_bytes(UART_NUM_1, "10", 2); // envía el comando "ON" por UART
+        uart_read_bytes(1, secs, (READ_BUF_SIZE), 20 / portTICK_RATE_MS);
+        uartPuts(0, secs);
         uartClrScr(0);
+        uartGotoxy(0, 5, 5);
         uartPuts(0, "Sended: 0x10");
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         uart_write_bytes(UART_NUM_1, "11", 2); // envía el comando "OFF" por UART

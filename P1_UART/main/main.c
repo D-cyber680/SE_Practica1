@@ -42,10 +42,11 @@ uint8_t send_led_state(uint8_t led_state)
 void send_temp(void)
 {
     int num = rand() % 100;
-    char cad[3];
-    myItoa(num, cad, 10);
+    char cad[30];
+    sprintf(cad, "TEMP.=%d",num);
     uartPuts(0, cad);
-    uart_write_bytes(UART_NUM_1, cad, strlen(cad));
+    uartPuts(1, cad);
+    //uart_write_bytes(UART_NUM_1, cad, strlen(cad));
 }
 
 // F comando 0x13
@@ -85,6 +86,8 @@ void app_main()
         {
             uartClrScr(0);
             uartPuts(0, "Comando: 0x12");
+            uartGotoxy(0, 5, 5);
+            send_temp();
         }
         else if (len == 2 && command[0] == '1' && command[1] == '3')
         {

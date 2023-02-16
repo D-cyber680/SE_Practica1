@@ -21,7 +21,7 @@
 void app_main()
 {
     char secs[20];
-    char led_state[2];
+    char led_state[20];
     char temperature[20];
     uart_config_t uart_config = {
         .baud_rate = BAUD_RATE,
@@ -36,10 +36,11 @@ void app_main()
     uart_driver_install(UART_NUM_1, 1024, 0, 0, NULL, 0);
 
     uartInit(0, 115200, 8, eStop, eParityEven, UART_TX_PIN0, UART_RX_PIN0); // uart_num, baudrate,  size,  parity, stop,  txPin,  rxPin)
-
+    uart_flush(1);
+    uart_flush(0);
     while (1)
     {
-        uart_write_bytes(UART_NUM_1, "10", 2); // envía el comando "ON" por UART
+        uart_write_bytes(UART_NUM_1, "10", 2); 
         uart_read_bytes(1, secs, (READ_BUF_SIZE), 20 / portTICK_RATE_MS);
         uartClrScr(0);
         uartGotoxy(0, 5, 5);
@@ -47,7 +48,7 @@ void app_main()
         vTaskDelay(pdMS_TO_TICKS(INTERVAL));
 
         uartClrScr(0);
-        uart_write_bytes(UART_NUM_1, "11", 2); // envía el comando "OFF" por UART
+        uart_write_bytes(UART_NUM_1, "11", 2); 
         uart_read_bytes(1, led_state, (READ_BUF_SIZE), 20 / portTICK_RATE_MS);
         uartGotoxy(0, 6, 5);
         uartPuts(0, led_state);

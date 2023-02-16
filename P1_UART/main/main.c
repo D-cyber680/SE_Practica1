@@ -41,9 +41,9 @@ uint8_t send_led_state(uint8_t led_state)
 // F. comando 0x12
 void send_temp(void)
 {
-    int num = rand() % 100;
+    uint8_t num = rand() % 100;
     char cad[20];
-    sprintf(cad, "TEMP.=%d",num);
+    sprintf(cad, "TEMP=%d",num);
     uartPuts(0, cad);
     uartPuts(1, cad);
     //uart_write_bytes(UART_NUM_1, cad, strlen(cad));

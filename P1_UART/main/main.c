@@ -53,10 +53,6 @@ void app_main()
             uartPuts(0, "Comando: 0x13");
             uartClrScr(0);
         }
-        else
-        {
-            uartClrScr(0);
-            uartPuts(0, "Ese comando no existe");
-        }
+        
     }
 }

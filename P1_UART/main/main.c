@@ -22,7 +22,7 @@ void app_main()
 {
     char secs[20];
     char led_state[2];
-    char temperature[30];
+    char temperature[20];
     uart_config_t uart_config = {
         .baud_rate = BAUD_RATE,
         .data_bits = UART_DATA_8_BITS,
@@ -39,19 +39,19 @@ void app_main()
 
     while (1)
     {
+        uart_flush(1);
         uart_write_bytes(UART_NUM_1, "10", 2); // envía el comando "ON" por UART
         uart_read_bytes(1, secs, (READ_BUF_SIZE), 20 / portTICK_RATE_MS);
         uartClrScr(0);
         uartGotoxy(0, 5, 5);
         uartPuts(0, secs);
-        // uartPuts(0, "Sended: 0x10");
         uart_flush(1);
         vTaskDelay(pdMS_TO_TICKS(INTERVAL));
 
         uartClrScr(0);
         uart_write_bytes(UART_NUM_1, "11", 2); // envía el comando "OFF" por UART
         uart_read_bytes(1, led_state, (READ_BUF_SIZE), 20 / portTICK_RATE_MS);
-        uartGotoxy(0, 5, 5);
+        uartGotoxy(0, 6, 5);
         uartPuts(0, led_state);
         // uartPuts(0, "Sended: 0x11");
         uart_flush(1);
@@ -60,7 +60,7 @@ void app_main()
         uartClrScr(0);
         uart_write_bytes(UART_NUM_1, "12", 2);
         uart_read_bytes(1, temperature, (READ_BUF_SIZE), 20 / portTICK_RATE_MS);
-        uartGotoxy(0, 5, 5);
+        uartGotoxy(0, 7, 5);
         uartPuts(0, temperature);
         // uartPuts(0, "Sended: 0x12");
         uart_flush(1);
@@ -68,6 +68,7 @@ void app_main()
 
         uart_write_bytes(UART_NUM_1, "13", 2);
         uartClrScr(0);
+        uartGotoxy(0, 8, 5);
         uartPuts(0, "0x13: Invertimos LED");
         uart_flush(1);
         vTaskDelay(pdMS_TO_TICKS(INTERVAL));

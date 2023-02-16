@@ -35,8 +35,7 @@ uint8_t send_led_state(uint8_t led_state)
     sprintf(led_cad, "led=%d", led_state);
     uartPuts(0, led_cad);
     uartPuts(1, led_cad);
-    //uart_write_bytes(UART_NUM_1, led_cad, strlen(led_cad));
-    return led_state;
+     return led_state;
 }
 // F. comando 0x12
 void send_temp(void)

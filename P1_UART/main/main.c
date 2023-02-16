@@ -17,6 +17,37 @@
 #define LED (GPIO_NUM_2)
 
 #define BAUD_RATE 115200
+/ F comando 0x10
+uint32_t get_time_in_seconds()
+{
+    // enviar devuelta
+    return xTaskGetTickCount() / configTICK_RATE_HZ;
+}
+
+// F. cmd. 0x11
+uint8_t send_led_state(uint8_t led_state)
+{
+    char led_cad[20];
+    sprintf(led_cad, "led = %d",led_state);
+    uart_write_bytes(UART_NUM_1, led_cad, strlen(led_cad));
+    return led_state;
+}
+// F. comando 0x12
+void send_temp(void)
+{
+    int num = rand() % 100;
+    char cad[3];
+    myItoa(num, cad, 10);
+    uartPuts(0, cad);
+    uart_write_bytes(UART_NUM_1, cad, strlen(cad));
+}
+
+// F comando 0x13
+void toggle_led_state(uint8_tled_state)
+{
+    led_state == 1 ? (led_state = 0) : (led_state = 1);
+    gpio_set_level(LED,led_state);
+}
 
 void app_main()
 {

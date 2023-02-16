@@ -42,7 +42,7 @@ uint8_t send_led_state(uint8_t led_state)
 void send_temp(void)
 {
     int num = rand() % 100;
-    char cad[30];
+    char cad[20];
     sprintf(cad, "TEMP.=%d",num);
     uartPuts(0, cad);
     uartPuts(1, cad);

@@ -43,10 +43,9 @@ void send_temp(void)
 {
     //uint8_t num = rand() % 100;
     char cad[20];
-    //sprintf(cad, "TEMP=%d",num);
-    uartPuts(0, "temp=45C");
-    uartPuts(1, "temp=45C");
-    //uart_write_bytes(UART_NUM_1, cad, strlen(cad));
+    sprintf(cad, "temp=45C");
+    uartPuts(0, cad);
+    uartPuts(1, cad);
 }
 
 // F comando 0x13
